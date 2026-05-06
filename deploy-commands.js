@@ -7,15 +7,16 @@ const { Routes } = require('discord-api-types/v10');
 
 // --- [NEW] Diagnostic Logging ---
 console.log('--- Checking Environment Variables ---');
-console.log(`CLIENT_ID is: ${process.env.CLIENT_ID}`);
+console.log(`CLIENT_ID is:     ${process.env.CLIENT_ID}`);
+console.log(`BOT_OWNER_ID is:  ${process.env.BOT_OWNER_ID}`);
 console.log(`DISCORD_TOKEN is: ${process.env.DISCORD_TOKEN ? 'Loaded (hidden for security)' : 'MISSING'}`);
-console.log(`DEV_GUILD_ID is: ${process.env.DEV_GUILD_ID}`);
+console.log(`DEV_GUILD_ID is:  ${process.env.DEV_GUILD_ID}`);
 console.log('------------------------------------');
 
 // --- Environment Variable Check ---
-const { CLIENT_ID, DISCORD_TOKEN, DEV_GUILD_ID } = process.env;
-if (!CLIENT_ID || !DISCORD_TOKEN || !DEV_GUILD_ID) {
-    console.error('Error: CLIENT_ID, DISCORD_TOKEN, and DEV_GUILD_ID must be provided in the .env file.');
+const { CLIENT_ID, BOT_OWNER_ID, DISCORD_TOKEN, DEV_GUILD_ID } = process.env;
+if (!CLIENT_ID || !BOT_OWNER_ID || !DISCORD_TOKEN || !DEV_GUILD_ID) {
+    console.error('Error: CLIENT_ID, BOT_OWNER_ID, DISCORD_TOKEN, and DEV_GUILD_ID must be provided in the .env file.');
     process.exit(1);
 }
 
