@@ -442,7 +442,7 @@ module.exports = {
                 }
 
             } else if (subcommand === 'list_users') {
-                console.log(`[DEBUG][${executionId}] initiating list_users processing.`);
+                console.log(`[DEBUG] Initiating list_users processing.`);
                 try {
                     const sourceChannelInfo = db.prepare('SELECT 1 FROM linked_channels WHERE channel_id = ?').get(channelId);
     
@@ -460,13 +460,13 @@ module.exports = {
                     const targetChannels = Array.from(targetChannelsMap.values());
     
                     if (targetChannels.length === 0) return;
-                    console.log(`[DEBUG][${executionId}] Found ${targetChannels.length} unique target channel(s) to relay to for group "${groupInfo.group_name}".`);
+                    console.log(`[DEBUG] Found ${targetChannels.length} unique target channel(s) to relay to for group "${groupInfo.group_name}".`);
                     
                     for (const target of targetChannels) {
                         channel = client.channels.cache.get(target.channel_id);
                         channel.fetch().then((channel)  => {
                             const targetChannelName = message.client.channels.cache.get(target.channel_id)?.name ?? target.channel_id;
-                            console.log(`[DEBUG][${executionId}] Channel "${targetChannelName} has the following members: ${target.members}.`);
+                            console.log(`[DEBUG] Channel "${targetChannelName} has the following members: ${target.members}.`);
                         }
                     )
                     
@@ -479,7 +479,7 @@ module.exports = {
                             
                         }
                 } catch (error) {
-                    console.log(`[DEBUG][${executionId}] Error: ${error}.`);
+                    console.error(`[DEBUG] Error: ${error}.`);
                 }
 
                 await interaction.reply({ content: `✅ Posted to debug`, ephemeral: true });
