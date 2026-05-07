@@ -75,11 +75,11 @@ module.exports = {
             }
 
             // 4. Blacklist Check
-			const isBlocked = db.prepare('SELECT 1 FROM group_blacklist WHERE group_id = ? AND (blocked_id = ? OR blocked_id = ?)').get(sourceChannelInfo.group_id, message.author.id, message.guild.id);
-			if (isBlocked) {
-				Logger.warn('BLOCK', `Message stopped from ${message.author.username} (${message.author.id}) in ${message.guild.name}`, executionId);
-				return;
-			}
+            const isBlocked = db.prepare('SELECT 1 FROM group_blacklist WHERE group_id = ? AND (blocked_id = ? OR blocked_id = ?)').get(sourceChannelInfo.group_id, message.author.id, message.guild.id);
+            if (isBlocked) {
+                Logger.warn('BLOCK', `Message stopped from ${message.author.username} (${message.author.id}) in ${message.guild.name}`, executionId);
+                return;
+            }
 
             const groupInfo = db.prepare('SELECT group_name FROM relay_groups WHERE group_id = ?').get(sourceChannelInfo.group_id);
             if (!groupInfo) {
@@ -195,12 +195,12 @@ module.exports = {
                 return; 
             }
 
-			const senderName = message.member?.displayName ?? message.author.username;
-			const serverBrand = sourceChannelInfo.brand_name || message.guild.name;
-			let username = `${senderName} (${serverBrand})`;
-			if (username.length > MAX_USERNAME_LENGTH) {
-				username = username.substring(0, MAX_USERNAME_LENGTH - 3) + '...';
-			}
+            const senderName = message.member?.displayName ?? message.author.username;
+            const serverBrand = sourceChannelInfo.brand_name || message.guild.name;
+            let username = `${senderName} (${serverBrand})`;
+            if (username.length > MAX_USERNAME_LENGTH) {
+                username = username.substring(0, MAX_USERNAME_LENGTH - 3) + '...';
+            }
             const avatarURL = message.author.displayAvatarURL();
             
             // [THE FIX] Added DISTINCT to the query to help, but we will also deduplicate in code
