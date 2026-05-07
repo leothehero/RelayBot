@@ -442,39 +442,44 @@ module.exports = {
                 }
 
             } else if (subcommand === 'list_users') {
-                const sourceChannelInfo = db.prepare('SELECT 1 FROM linked_channels WHERE channel_id = ?').get(channelId);
-
-                if (!sourceChannelInfo) {
-                    return interaction.reply({ content: '❌ **Error:** This channel is not linked to any relay group.', ephemeral: true });
-                }
-
-                const rawTargetChannels = db.prepare(`SELECT * FROM linked_channels WHERE group_id = ?`).all(sourceChannelInfo.group_id);
-
-                // [THE FIX] Manually deduplicate based on channel_id to be 100% safe against DB errors
-                const targetChannelsMap = new Map();
-                for (const t of rawTargetChannels) {
-                    targetChannelsMap.set(t.channel_id, t);
-                }
-                const targetChannels = Array.from(targetChannelsMap.values());
-
-                if (targetChannels.length === 0) return;
-                console.log(`[DEBUG][${executionId}] Found ${targetChannels.length} unique target channel(s) to relay to for group "${groupInfo.group_name}".`);
-                
-                for (const target of targetChannels) {
-                    channel = client.channels.cache.get(target.channel_id);
-                    channel.fetch().then((channel)  => {
-                        const targetChannelName = message.client.channels.cache.get(target.channel_id)?.name ?? target.channel_id;
-                        console.log(`[DEBUG][${executionId}] Channel "${targetChannelName} has the following members: ${target.members}.`);
+                console.log(`[DEBUG][${executionId}] initiating list_users processing.`);
+                try {
+                    const sourceChannelInfo = db.prepare('SELECT 1 FROM linked_channels WHERE channel_id = ?').get(channelId);
+    
+                    if (!sourceChannelInfo) {
+                        return interaction.reply({ content: '❌ **Error:** This channel is not linked to any relay group.', ephemeral: true });
                     }
-                )
+    
+                    const rawTargetChannels = db.prepare(`SELECT * FROM linked_channels WHERE group_id = ?`).all(sourceChannelInfo.group_id);
+    
+                    // [THE FIX] Manually deduplicate based on channel_id to be 100% safe against DB errors
+                    const targetChannelsMap = new Map();
+                    for (const t of rawTargetChannels) {
+                        targetChannelsMap.set(t.channel_id, t);
+                    }
+                    const targetChannels = Array.from(targetChannelsMap.values());
+    
+                    if (targetChannels.length === 0) return;
+                    console.log(`[DEBUG][${executionId}] Found ${targetChannels.length} unique target channel(s) to relay to for group "${groupInfo.group_name}".`);
+                    
+                    for (const target of targetChannels) {
+                        channel = client.channels.cache.get(target.channel_id);
+                        channel.fetch().then((channel)  => {
+                            const targetChannelName = message.client.channels.cache.get(target.channel_id)?.name ?? target.channel_id;
+                            console.log(`[DEBUG][${executionId}] Channel "${targetChannelName} has the following members: ${target.members}.`);
+                        }
+                    )
                     
                     //channel.fetch().then((channel) => {
-                    //    console.log(channel.name);
-                    //    for (let [snowflake, guildMember] of channel.members) {
-                    //        console.log(`${guildMember.displayName} (${guildMember.id})`);
-                    //    }
-                    //});
-                
+                        //    console.log(channel.name);
+                        //    for (let [snowflake, guildMember] of channel.members) {
+                            //        console.log(`${guildMember.displayName} (${guildMember.id})`);
+                            //    }
+                            //});
+                            
+                        }
+                } catch (error) {
+                    console.log(`[DEBUG][${executionId}] Error: ${error}.`);
                 }
 
                 await interaction.reply({ content: `✅ Posted to debug`, ephemeral: true });
