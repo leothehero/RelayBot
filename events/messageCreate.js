@@ -320,7 +320,8 @@ module.exports = {
                         finalContent = `*(Unmapped role in original message. Admin can map it or enable auto-sync.))*`;
                     }
 
-                    let finalPayloadContent = replyPing + finalContent;
+                    //let finalPayloadContent = replyPing + finalContent;
+                    let finalPayloadContent = finalContent;
 
                     // --- Attachments / Voice / Forwarded Logic ---
                     let fileNoticeString = "";
