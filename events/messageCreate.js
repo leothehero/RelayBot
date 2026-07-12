@@ -77,7 +77,10 @@ module.exports = {
             // 4. Blacklist Check
             const isBlocked = db.prepare('SELECT 1 FROM group_blacklist WHERE group_id = ? AND (blocked_id = ? OR blocked_id = ?)').get(sourceChannelInfo.group_id, message.author.id, message.guild.id);
             if (isBlocked) {
-                Logger.warn('BLOCK', `Message stopped from ${message.author.username} (${message.author.id}) in ${message.guild.name}`, executionId);
+                Logger.info('BLOCK', `Message stopped from ${message.author.username} (${message.author.id}) in ${message.guild.name}`, executionId);
+                message.delete()
+                .then(message => Logger.info(`Deleted message from ${message.author.username} (${message.author.id}) in ${message.guild.name}`, executionId))
+                .catch(console.error);;
                 return;
             }
 
