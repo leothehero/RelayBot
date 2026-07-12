@@ -8,7 +8,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('group_owner')
         .setDescription('Commands for the Group Owner to manage filters and blocks.')
-        .setDefaultMemberPermissions(0) // Logic handles permissions internally
+        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers) // Logic handles permissions internally
         .addSubcommand(subcommand => subcommand.setName('add_filter').setDescription('Add a phrase to the filter.')
             .addStringOption(option => option.setName('phrase').setDescription('The word/phrase to censor.').setRequired(true))
             .addIntegerOption(option => option.setName('threshold').setDescription('Strikes before block (0=Off, 1=Instant).').setRequired(false).setMinValue(0).setMaxValue(100))
