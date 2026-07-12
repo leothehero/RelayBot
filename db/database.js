@@ -4,6 +4,7 @@ const path = require('path');
 const Database = require('better-sqlite3');
 
 // --- Define Paths and Detect Environment ---
+const volumePath = process.env.VOLUME_PATH;
 const volumePath = '/data';
 const dbName = 'database.db';
 let dbPath;
