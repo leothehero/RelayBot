@@ -1,6 +1,7 @@
 // events/messageUpdate.js
 const { Events, WebhookClient, EmbedBuilder } = require('discord.js');
 const db = require('../db/database.js');
+const { formatUserMentions } = require('../utils/mentionFormatter.js');
 const webhookManager = require('../utils/webhookManager.js');
 
 const MAX_USERNAME_LENGTH = 80;
@@ -66,6 +67,9 @@ async function rebuildAndEdit(client, originalMessageId) {
             }
         }
 
+        // User pings become the nickname from this server: `@Nickname`
+        finalContent = formatUserMentions(finalContent, originalMessage);
+
         // Add attachment links if present (since we can't re-upload files easily on edit)
         if (originalMessage.attachments.size > 0) {
             const attachmentLinks = originalMessage.attachments.map(a => a.url).join('\n');
@@ -119,7 +123,6 @@ async function rebuildAndEdit(client, originalMessageId) {
             try {
                 // Reply Embed Logic (Unique per target)
                 let replyEmbed = null;
-                let replyPing = '';
 
                 if (originalMessage.reference && originalMessage.reference.messageId) {
                     // Try to fetch replied-to message info
@@ -132,7 +135,7 @@ async function rebuildAndEdit(client, originalMessageId) {
                     if (repliedMessage) {
                         const repliedAuthorName = repliedMessage.member?.displayName ?? repliedMessage.author.username;
                         const repliedAuthorAvatar = repliedMessage.author.displayAvatarURL();
-                        let repliedContent = repliedMessage.content ? repliedMessage.content.substring(0, 1000) : '*(Message had no text content)*';
+                        let repliedContent = repliedMessage.content ? formatUserMentions(repliedMessage.content, repliedMessage).substring(0, 1000) : '*(Message had no text content)*';
                         if (repliedMessage.editedTimestamp) repliedContent += ' *(edited)*';
 
                         // DB Lookup for Link
@@ -155,15 +158,15 @@ async function rebuildAndEdit(client, originalMessageId) {
                             .setColor('#B0B8C6')
                             .setAuthor({ name: `Replying to ${repliedAuthorName}`, url: messageLink, iconURL: repliedAuthorAvatar })
                             .setDescription(repliedContent);
-                        
-                        replyPing = `<@${repliedMessage.author.id}> `;
+
+                        // No reply ping here: new relayed messages do not ping the replied user either.
                     } else {
                         replyEmbed = new EmbedBuilder().setColor('#B0B8C6').setDescription('*Replying to a deleted or inaccessible message.*');
                     }
                 }
 
                 // Combine Content
-                const targetContent = replyPing + finalContent;
+                const targetContent = finalContent;
 
                 const payload = {
                     content: targetContent,
